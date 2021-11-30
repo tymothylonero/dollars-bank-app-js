@@ -18,15 +18,13 @@ function mainMenu() {
                 console.log("\nCreating a new account!\n");
                 let newAccount = createAccount(accounts);
                 accounts.push(newAccount);
-                modifiedAccount = accountMenu(newAccount);
-                //accounts = updateAccount(accounts, modifiedAccount);
+                accountMenu(newAccount);
                 break;
             case "2":
                 console.log("\nLogging into an account!\n");
                 let account = accountLogin(accounts);
                 if(account != -1) {
-                    modifiedAccount = accountMenu(account);
-                    //accounts = updateAccount(accounts, modifiedAccount);
+                    accountMenu(account);
                 }
                 break;
             case "3":
@@ -45,37 +43,40 @@ function mainMenu() {
 function accountMenu(account) {
 
     loggedIn = true;
-    accountBalance = 0;
-
-    console.log("Your first transaction:");
-    console.log(account.t1);
 
     do {
         console.log("Transaction Menu:\n1. Account Balance Check\n2. Print Transactions\n3. Update PIN\n4. Withdraw Amount\n5. Deposit Amount\n6. Exit");
         var action = get6NumberInput();
         switch(action) {
             case "1":
-                console.log(`\nYour balance is: $${accountBalance}\n`);
+                console.log(`\nYour balance is: $${account.balance}\n`);
                 break;
             case "2":
                 console.log("\nThese are your five most recent transactions:\n");
                 console.log(account.t1 + account.t2 + account.t3 + account.t4 + account.t5);
                 break;
             case "3":
-                console.log("\nUpdating PIN!\n");
                 account.pin = updatePIN();
                 break;
             case "4":
                 console.log("\nEnter an amount to withdraw:\n");
                 var amount = getFloat("Please enter an amount: $");
-                console.log(`Successfully withdrew $${amount}!`);
-                account.balance = account.balance - amount;
+                if(amount > account.balance)
+                    console.log("Cannot withdraw more than what is in your account!");
+                else {
+                    console.log(`Successfully withdrew $${amount}!\n`);
+                    account.balance = account.balance - amount;
+                    console.log(`Your new balance is: $${account.balance}\n`);
+                    addTransaction(account, createTransaction("Withdrawl", "User withdrawl", amount, account.balance));
+                }
                 break;
             case "5":
                 console.log("\nEnter an amount to deposit:\n");
                 var amount = getFloat("Please enter an amount: $");
                 console.log(`Successfully deposited $${amount}!`);
                 account.balance = account.balance + amount;
+                console.log(`Your new balance is: $${account.balance}\n`);
+                addTransaction(account, createTransaction("Deposit", "User deposit", amount, account.balance));
                 break;
             case "6":
                 loggedIn = false;
@@ -85,9 +86,7 @@ function accountMenu(account) {
                 break;
         }
     } while (loggedIn);
-    console.log("\nLogging out...\n")
-
-    return account;
+    console.log("\nLogging out...\n");
 }
 
 
@@ -118,7 +117,7 @@ function createAccount(accounts) {
 
     var inputInit = getFloat("Please enter an initial deposit: $");
 
-    t1 = createTransaction("Deposit", "Initial deposit", inputInit);
+    t1 = createTransaction("Deposit", "Initial deposit", inputInit, inputInit);
 
     let newAccount = {
 
@@ -132,6 +131,7 @@ function createAccount(accounts) {
         "t5": "",
 
     }
+    console.log("\nSuccessfully created your account!\n");
     return newAccount;
 }
 
@@ -145,52 +145,38 @@ function accountLogin(accounts) {
         console.log("\nInvalid credentials. Try again.\n");
         return -1;
     } else {
+        console.log("\nWelcome back!\n");
         return found;
     }
 }
 
-// Allows a user to perform a deposit
-function deposit(account) {
-
-}
-
-// Allows a user to perform a withdrawl
-function withdraw(account) {
-    
+// Adds a transaction to the account
+function addTransaction(account, transaction) {
+    account.t5 = account.t4;
+    account.t4 = account.t3;
+    account.t3 = account.t2;
+    account.t2 = account.t1;
+    account.t1 = transaction;
 }
 
 // Create a transaction
-function createTransaction(type, description, amount) {
-    return "Type: " + type + "\n" + description + "\nFor $" + amount + "\nOn " + new Date().toString() + "\n";
+function createTransaction(type, description, amount, balance) {
+    return "Type: " + type + "\n" + description + "\nFor: $" + amount + "\nAccount balance is: $" + balance + "\nAs of " + new Date().toString() + "\n\n";
 }
-
-// Push updates to an account to the account list
-// function updateAccount(accounts, account) {
-
-//     console.log("OLD ACCOUNT LIST:")
-//     console.log(accounts);
-//     // find account with same id in 'account'
-//     let oldAccount = accounts.find(oldAccount => oldAccount.id === account.id);
-
-//     // remove the found entry from accounts
-//     index = accounts.indexOf(oldAccount);
-//     if(index > -1) {
-//         accounts.splice(index, 1);
-//     }
-
-//     // push the modified account to 'accounts'
-//     accounts.push(account);
-
-//     console.log("NEW ACCOUNT LIST:")
-//     console.log(accounts);
-
-//     return accounts;
-// }
 
 // Allows the user to change their PIN
 function updatePIN() {
-    newPIN = prompt("Enter a new PIN:");
-    return newPIN;
+    newPin = "";
+    valid = false;
+    do {
+        newPin = prompt("Please enter a new PIN for this account: ");
+        verifyPin = prompt("Please verify the PIN: ");
+        if(newPin == verifyPin)
+            valid = true;
+        else
+            console.log("The PINs do not match. Try again.\n");
+    } while(!valid);
+    return newPin;
 }
 
 
