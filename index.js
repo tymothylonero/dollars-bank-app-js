@@ -105,15 +105,16 @@ function createAccount(accounts) {
         }
     } while(!valid);
 
-    valid = false;
+    validPin = false;
     do {
-        inputPin = prompt("Please enter a PIN for this account: ");
+        //inputPin = prompt("Please enter a PIN for this account: ");
+        inputPin = newPin("Please enter a 4-digit PIN for this account: ");
         verifyPin = prompt("Please verify the PIN: ");
         if(inputPin == verifyPin)
-            valid = true;
+            validPin = true;
         else
             console.log("The PINs do not match. Try again.\n");
-    } while(!valid);
+    } while(!validPin);
 
     var inputInit = getFloat("Please enter an initial deposit: $");
 
@@ -166,17 +167,17 @@ function createTransaction(type, description, amount, balance) {
 
 // Allows the user to change their PIN
 function updatePIN() {
-    newPin = "";
+    updatedPin = "";
     valid = false;
     do {
-        newPin = prompt("Please enter a new PIN for this account: ");
+        updatedPin = newPin("Please enter a new PIN for this account: ");
         verifyPin = prompt("Please verify the PIN: ");
-        if(newPin == verifyPin)
+        if(updatedPin == verifyPin)
             valid = true;
         else
             console.log("The PINs do not match. Try again.\n");
     } while(!valid);
-    return newPin;
+    return updatedPin;
 }
 
 
@@ -229,6 +230,26 @@ function getFloat(message) {
     } while (valid == false);
 
     return input;
+}
+
+
+// Manages the creation of a new pin
+function newPin(message) {
+
+    valid = false;
+    var input;
+    var pin;
+
+    do {
+        pin = prompt(message);
+        input = parseFloat(pin);
+        if(input >= 0 && input < 10000 && pin.length == 4)
+            valid = true;
+        else
+            console.log(`Error: ${pin} is an invalid 4-digit pin.`);
+    } while (!valid);
+
+    return pin;
 }
 
 
