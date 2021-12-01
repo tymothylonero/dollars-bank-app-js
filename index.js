@@ -14,12 +14,14 @@ function mainMenu() {
 
         var action = get3NumberInput();
         switch(action) {
+            // Create a new account and call the account menu
             case "1":
                 console.log("\nCreating a new account!\n");
                 let newAccount = createAccount(accounts);
                 accounts.push(newAccount);
                 accountMenu(newAccount);
                 break;
+            // Log into an account and call the account menu
             case "2":
                 console.log("\nLogging into an account!\n");
                 let account = accountLogin(accounts);
@@ -27,9 +29,11 @@ function mainMenu() {
                     accountMenu(account);
                 }
                 break;
+            // Exits the application
             case "3":
                 running = false;
                 break;
+            // Invalid selection
             default:
                 console.log("Error: Invalid input!");
                 break;
@@ -48,16 +52,20 @@ function accountMenu(account) {
         console.log("Transaction Menu:\n1. Account Balance Check\n2. Print Transactions\n3. Update PIN\n4. Withdraw Amount\n5. Deposit Amount\n6. Exit");
         var action = get6NumberInput();
         switch(action) {
+            // Displays the account's current balance
             case "1":
                 console.log(`\nYour balance is: $${account.balance}\n`);
                 break;
+            // Displays the five most recent transactions
             case "2":
                 console.log("\nThese are your five most recent transactions:\n");
                 console.log(account.t1 + account.t2 + account.t3 + account.t4 + account.t5);
                 break;
+            // Allows the user to change their 4-digit PIN
             case "3":
                 account.pin = updatePIN();
                 break;
+            // Allows the user to withdraw money from their account
             case "4":
                 console.log("\nEnter an amount to withdraw:\n");
                 var amount = getFloat("Please enter an amount: $");
@@ -70,6 +78,7 @@ function accountMenu(account) {
                     addTransaction(account, createTransaction("Withdrawl", "User withdrawl", amount, account.balance));
                 }
                 break;
+            // Allows the user to deposit money into their account
             case "5":
                 console.log("\nEnter an amount to deposit:\n");
                 var amount = getFloat("Please enter an amount: $");
@@ -78,9 +87,11 @@ function accountMenu(account) {
                 console.log(`Your new balance is: $${account.balance}\n`);
                 addTransaction(account, createTransaction("Deposit", "User deposit", amount, account.balance));
                 break;
+            // Log out of the user's account
             case "6":
                 loggedIn = false;
                 break;
+            // Invalid selection
             default:
                 console.log("Error: Invalid input!");
                 break;
@@ -93,6 +104,7 @@ function accountMenu(account) {
 // Create account
 function createAccount(accounts) {
 
+    // Get a new account ID
     inputId = "";
     valid = false;
     do {
@@ -105,9 +117,9 @@ function createAccount(accounts) {
         }
     } while(!valid);
 
+    // Get a valid 4-digit PIN
     validPin = false;
     do {
-        //inputPin = prompt("Please enter a PIN for this account: ");
         inputPin = newPin("Please enter a 4-digit PIN for this account: ");
         verifyPin = prompt("Please verify the PIN: ");
         if(inputPin == verifyPin)
@@ -116,10 +128,11 @@ function createAccount(accounts) {
             console.log("The PINs do not match. Try again.\n");
     } while(!validPin);
 
+    // Get an initial deposit amount
     var inputInit = getFloat("Please enter an initial deposit: $");
 
+    // Create the new account
     t1 = createTransaction("Deposit", "Initial deposit", inputInit, inputInit);
-
     let newAccount = {
 
         "id": inputId,
@@ -139,8 +152,11 @@ function createAccount(accounts) {
 // Login into account
 function accountLogin(accounts) {
 
+    // Get the account ID and PIN
     id = prompt("Enter your account ID: ");
     pin = prompt("Enter your account PIN: ");
+
+    // Check if the given credentials exist
     let found = accounts.find(found => found.id === id && found.pin === pin);
     if(accounts.indexOf(found) == -1) {
         console.log("\nInvalid credentials. Try again.\n");
@@ -151,7 +167,7 @@ function accountLogin(accounts) {
     }
 }
 
-// Adds a transaction to the account
+// Adds a transaction to the account, shifting the old ones down
 function addTransaction(account, transaction) {
     account.t5 = account.t4;
     account.t4 = account.t3;
@@ -160,7 +176,7 @@ function addTransaction(account, transaction) {
     account.t1 = transaction;
 }
 
-// Create a transaction
+// Creates a transaction, which formats the parameters into a readable string
 function createTransaction(type, description, amount, balance) {
     return "Type: " + type + "\n" + description + "\nFor: $" + amount + "\nAccount balance is: $" + balance + "\nAs of " + new Date().toString() + "\n\n";
 }
@@ -192,7 +208,7 @@ function get3NumberInput() {
         if(input == "1" || input == "2" || input == "3")
             valid = true;
         else
-            console.log(`Invalid input ${input}! Try again.`)
+            console.log(`Invalid input '${input}'! Try again.`)
     } while (valid == false);
     return input;
 }
@@ -209,27 +225,28 @@ function get6NumberInput() {
         if(input == "1" || input == "2" || input == "3" || input == "4" || input == "5" || input == "6")
             valid = true;
         else
-            console.log(`Invalid input ${input}! Try again.`)
+            console.log(`Invalid input '${input}'! Try again.`)
     } while (valid == false);
     return input;
 }
 
 
-// Gets a positive double
+// Gets a positive double from the user with validation
 function getFloat(message) {
 
     valid = false;
     var input;
 
     do {
-        input = parseFloat(prompt(message));
-        if(input >= 0)
+        input = prompt(message);
+        value = parseFloat(input);
+        if(value >= 0)
             valid = true;
         else
-            console.log(`Error: ${input} is an invalid amount.`);
+            console.log(`Error: '${input}' is an invalid amount.`);
     } while (valid == false);
 
-    return input;
+    return value;
 }
 
 
@@ -246,7 +263,7 @@ function newPin(message) {
         if(input >= 0 && input < 10000 && pin.length == 4)
             valid = true;
         else
-            console.log(`Error: ${pin} is an invalid 4-digit pin.`);
+            console.log(`Error: '${pin}' is an invalid 4-digit pin.`);
     } while (!valid);
 
     return pin;
