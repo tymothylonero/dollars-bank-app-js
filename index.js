@@ -154,6 +154,13 @@ function accountLogin(accounts) {
 
     // Get the account ID and PIN
     id = prompt("Enter your account ID: ");
+
+    let user = accounts.find(user => user.id === id);
+    if(accounts.indexOf(user) == -1) {
+        console.log("\nUser not found. Try again.\n");
+        return -1;
+    }
+
     pin = prompt("Enter your account PIN: ");
 
     // Check if the given credentials exist
